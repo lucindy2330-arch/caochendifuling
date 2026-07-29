@@ -1,0 +1,1561 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>地缚灵</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;600;700&family=Ma+Shan+Zheng&family=ZCOOL+XiaoWei&family=Long+Cang&family=Zhi+Mang+Xing&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* Autumn desk palette */
+  --bg-page: #1a1510;
+  --desk-surface: #261e16;
+  --desk-edge: #3a2e22;
+  /* Paper */
+  --paper-bg: #f5edd6;
+  --paper-aged: #ece0c4;
+  --paper-dark: #d8c9a8;
+  --paper-shadow: rgba(60, 40, 20, 0.5);
+  --paper-text: #4a3828;
+  --paper-text-light: #6a5840;
+  --inner-ink: #7a5a3a;
+  /* Autumn accents */
+  --autumn-gold: #c4943a;
+  --autumn-orange: #c87840;
+  --autumn-red: #a85030;
+  --autumn-brown: #8a6840;
+  --autumn-olive: #7a8a50;
+  --autumn-amber: #d4a844;
+  --autumn-crimson: #b85a40;
+  /* Wax */
+  --wax-red: #8b2020;
+  --wax-dark: #6a1818;
+  /* Typography */
+  --serif: 'Noto Serif SC', 'Georgia', serif;
+  --hand: 'Long Cang', 'Ma Shan Zheng', cursive;
+  --brush: 'Zhi Mang Xing', 'Ma Shan Zheng', cursive;
+  --xiaowei: 'ZCOOL XiaoWei', 'Noto Serif SC', serif;
+  /* Effects */
+  --glow-warm: rgba(200, 148, 64, 0.3);
+  --glow-gold: rgba(212, 168, 68, 0.25);
+  --glow-amber: rgba(200, 120, 64, 0.2);
+  --glow-crimson: rgba(184, 90, 64, 0.2);
+  --glow-olive: rgba(122, 138, 80, 0.2);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+
+body {
+  background: var(--bg-page);
+  color: var(--paper-text);
+  font-family: var(--serif);
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* ==================== DESK BACKGROUND ==================== */
+.desk-bg {
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 30% 20%, rgba(60, 40, 20, 0.35) 0%, transparent 60%),
+    radial-gradient(ellipse at 70% 80%, rgba(50, 35, 15, 0.3) 0%, transparent 55%),
+    linear-gradient(180deg, #1a1510 0%, #1e1812 40%, #261e16 100%);
+  z-index: 0;
+}
+
+.dust-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* ==================== READER CONTAINER ==================== */
+.reader {
+  position: relative;
+  z-index: 2;
+  max-width: 680px;
+  margin: 0 auto;
+  min-height: 100vh;
+  padding: 20px 16px 60px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ==================== HEADER BAR ==================== */
+.reader-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: rgba(30, 24, 18, 0.92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(100, 80, 50, 0.2);
+  padding: 12px 20px;
+  margin: -20px -16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.header-title {
+  font-family: var(--brush);
+  font-size: 22px;
+  color: var(--autumn-gold);
+  letter-spacing: 4px;
+  text-shadow: 0 1px 4px rgba(200, 148, 58, 0.2);
+}
+
+.header-meta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-family: var(--xiaowei);
+  font-size: 12px;
+  color: var(--autumn-brown);
+  letter-spacing: 2px;
+}
+.header-progress {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.progress-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgba(120, 90, 50, 0.3);
+  transition: background 0.4s, transform 0.4s;
+}
+.progress-dot.active {
+  background: var(--autumn-gold);
+  transform: scale(1.4);
+}
+.progress-dot.read {
+  background: var(--autumn-brown);
+}
+
+/* ==================== CONTENT AREA ==================== */
+.reader-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* ==================== ERA SEPARATOR ==================== */
+.era-sep {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 28px 0 20px;
+  gap: 14px;
+  animation: fadeSlideUp 0.7s ease;
+}
+.era-sep::before,
+.era-sep::after {
+  content: '';
+  flex: 1;
+  max-width: 80px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--autumn-brown), transparent);
+  opacity: 0.5;
+}
+.era-sep-label {
+  font-family: var(--xiaowei);
+  font-size: 13px;
+  color: var(--autumn-gold);
+  letter-spacing: 4px;
+  white-space: nowrap;
+  opacity: 0.85;
+}
+
+/* ==================== FOLDED PAPER (sealed state) ==================== */
+.folded-paper {
+  position: relative;
+  max-width: 560px;
+  margin: 0 auto 24px;
+  cursor: pointer;
+  animation: paperSlideIn 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  opacity: 0;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.folded-paper:hover {
+  transform: translateY(-4px) rotate(-0.3deg);
+}
+.folded-paper:active {
+  transform: scale(0.99);
+}
+
+.paper-folded-body {
+  position: relative;
+  background:
+    /* wrinkle lines */
+    repeating-linear-gradient(172deg, transparent, transparent 22px, rgba(160, 130, 90, 0.05) 22px, rgba(160, 130, 90, 0.05) 23px),
+    repeating-linear-gradient(188deg, transparent, transparent 28px, rgba(140, 110, 70, 0.04) 28px, rgba(140, 110, 70, 0.04) 29px),
+    /* coffee stain */
+    radial-gradient(ellipse at 80% 20%, rgba(180, 140, 80, 0.06) 0%, transparent 50%),
+    radial-gradient(ellipse at 15% 75%, rgba(160, 120, 70, 0.05) 0%, transparent 45%),
+    /* age gradient */
+    linear-gradient(135deg, var(--paper-bg) 0%, var(--paper-aged) 50%, var(--paper-dark) 100%);
+  border-radius: 2px 4px 4px 2px;
+  padding: 32px 28px 28px;
+  box-shadow:
+    0 6px 20px var(--paper-shadow),
+    0 2px 6px rgba(0,0,0,0.3),
+    inset 0 0 40px rgba(180, 150, 100, 0.08);
+  border: 1px solid rgba(160, 130, 80, 0.15);
+  overflow: hidden;
+  /* folded look */
+  transform: rotate(-0.5deg);
+}
+
+.paper-folded-body::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(5deg, transparent 48%, rgba(140, 110, 70, 0.06) 48%, rgba(140, 110, 70, 0.06) 49%, transparent 49%),
+    linear-gradient(175deg, transparent 35%, rgba(150, 120, 80, 0.04) 35%, rgba(150, 120, 80, 0.04) 35.5%, transparent 35.5%),
+    linear-gradient(168deg, transparent 62%, rgba(130, 100, 60, 0.05) 62%, rgba(130, 100, 60, 0.05) 62.5%, transparent 62.5%);
+  pointer-events: none;
+}
+
+/* Fold crease in middle */
+.paper-folded-body::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(120, 90, 50, 0.15), transparent);
+  pointer-events: none;
+}
+
+.folded-time {
+  text-align: center;
+  font-family: var(--hand);
+  font-size: 17px;
+  color: var(--paper-text);
+  margin-bottom: 20px;
+  letter-spacing: 1px;
+}
+
+.folded-seal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.seal-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 35%, var(--wax-red), var(--wax-dark));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    0 3px 10px rgba(0,0,0,0.4),
+    inset 0 1px 3px rgba(255,200,200,0.2),
+    inset 0 -3px 5px rgba(0,0,0,0.3);
+  animation: sealPulse 3s ease-in-out infinite;
+  position: relative;
+}
+.seal-icon::before {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,200,200,0.12);
+}
+.seal-char {
+  font-family: var(--brush);
+  font-size: 20px;
+  color: rgba(255, 220, 200, 0.65);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+
+.seal-hint {
+  font-family: var(--xiaowei);
+  font-size: 12px;
+  color: var(--paper-text-light);
+  letter-spacing: 3px;
+  opacity: 0.6;
+  animation: hintFade 2.5s ease-in-out infinite;
+}
+
+/* Era color accent */
+.folded-paper .paper-folded-body { border-left: 3px solid var(--autumn-gold); }
+.folded-paper[data-era="dusk"] .paper-folded-body { border-left-color: var(--autumn-amber); }
+.folded-paper[data-era="past-morning"] .paper-folded-body { border-left-color: var(--autumn-orange); }
+.folded-paper[data-era="notes"] .paper-folded-body { border-left-color: var(--autumn-olive); }
+.folded-paper[data-era="truth"] .paper-folded-body { border-left-color: var(--autumn-crimson); }
+.folded-paper[data-era="moving"] .paper-folded-body { border-left-color: var(--autumn-brown); }
+.folded-paper[data-era="walk"] .paper-folded-body { border-left-color: var(--autumn-orange); }
+
+/* ==================== OPEN PAPER (content state) ==================== */
+.open-paper {
+  position: relative;
+  max-width: 600px;
+  margin: 0 auto 28px;
+  background:
+    /* subtle wrinkles */
+    repeating-linear-gradient(174deg, transparent, transparent 30px, rgba(150, 120, 80, 0.03) 30px, rgba(150, 120, 80, 0.03) 31px),
+    repeating-linear-gradient(186deg, transparent, transparent 38px, rgba(130, 100, 60, 0.025) 38px, rgba(130, 100, 60, 0.025) 39px),
+    /* age spots */
+    radial-gradient(ellipse at 85% 15%, rgba(180, 140, 80, 0.04) 0%, transparent 40%),
+    radial-gradient(ellipse at 10% 85%, rgba(160, 120, 70, 0.035) 0%, transparent 35%),
+    linear-gradient(135deg, var(--paper-bg) 0%, var(--paper-aged) 60%, var(--paper-dark) 100%);
+  border-radius: 3px;
+  padding: 36px 32px 32px;
+  box-shadow:
+    0 8px 28px var(--paper-shadow),
+    0 2px 8px rgba(0,0,0,0.25),
+    inset 0 0 50px rgba(180, 150, 100, 0.06);
+  border: 1px solid rgba(160, 130, 80, 0.12);
+  border-left: 3px solid var(--autumn-gold);
+  animation: paperUnfold 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  opacity: 0;
+  transform-origin: top center;
+}
+
+.open-paper[data-era="dusk"] { border-left-color: var(--autumn-amber); }
+.open-paper[data-era="past-morning"] { border-left-color: var(--autumn-orange); }
+.open-paper[data-era="notes"] { border-left-color: var(--autumn-olive); }
+.open-paper[data-era="truth"] { border-left-color: var(--autumn-crimson); }
+.open-paper[data-era="moving"] { border-left-color: var(--autumn-brown); }
+.open-paper[data-era="walk"] { border-left-color: var(--autumn-orange); }
+
+.open-paper::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(3deg, transparent 48%, rgba(140, 110, 70, 0.04) 48%, rgba(140, 110, 70, 0.04) 49%, transparent 49%),
+    linear-gradient(177deg, transparent 30%, rgba(150, 120, 80, 0.03) 30%, rgba(150, 120, 80, 0.03) 30.5%, transparent 30.5%);
+  pointer-events: none;
+  border-radius: 3px;
+}
+
+.paper-header {
+  text-align: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(140, 110, 70, 0.15);
+}
+.paper-time {
+  font-family: var(--hand);
+  font-size: 16px;
+  color: var(--paper-text);
+  letter-spacing: 1px;
+}
+
+/* ==================== PROSE CONTENT ==================== */
+.prose-block {
+  margin-bottom: 14px;
+  animation: inkSpread 0.6s ease forwards;
+  opacity: 0;
+}
+
+.prose-paragraph {
+  font-family: var(--serif);
+  font-size: 15px;
+  line-height: 2;
+  color: var(--paper-text);
+  text-indent: 2em;
+  letter-spacing: 0.3px;
+  text-align: justify;
+}
+
+.prose-inner {
+  font-family: var(--serif);
+  font-size: 14px;
+  line-height: 1.9;
+  color: var(--inner-ink);
+  font-style: italic;
+  text-indent: 2em;
+  letter-spacing: 0.3px;
+  padding: 6px 0 6px 16px;
+  border-left: 2px solid rgba(140, 110, 70, 0.2);
+  margin: 10px 0;
+  opacity: 0.85;
+  position: relative;
+}
+.prose-inner::before {
+  content: '— ';
+  color: var(--autumn-brown);
+  opacity: 0.5;
+}
+
+.prose-image {
+  font-family: var(--xiaowei);
+  font-size: 13px;
+  color: var(--paper-text-light);
+  padding: 12px 16px;
+  margin: 12px 0;
+  border: 1px dashed rgba(140, 110, 70, 0.25);
+  border-radius: 4px;
+  background: rgba(180, 150, 100, 0.04);
+  letter-spacing: 0.5px;
+  line-height: 1.7;
+}
+.prose-image::before {
+  content: '备忘 · ';
+  font-family: var(--hand);
+  color: var(--autumn-brown);
+  opacity: 0.6;
+}
+
+/* ==================== NEXT PROMPT ==================== */
+.next-prompt {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 20px 0 8px;
+  animation: fadeSlideUp 0.6s ease;
+}
+.next-btn {
+  background: none;
+  border: 1px solid rgba(200, 148, 58, 0.25);
+  color: var(--autumn-gold);
+  padding: 10px 32px;
+  border-radius: 24px;
+  font-family: var(--xiaowei);
+  font-size: 13px;
+  letter-spacing: 3px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.next-btn:hover {
+  border-color: rgba(200, 148, 58, 0.55);
+  box-shadow: 0 0 24px rgba(200, 148, 58, 0.12);
+  transform: translateY(-1px);
+}
+
+/* ==================== EFFECT OVERLAY ==================== */
+.fx-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 50;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+.fx-overlay.active { opacity: 1; }
+
+.fx-overlay.warm {
+  background: radial-gradient(ellipse at 50% 35%, var(--glow-warm), transparent 70%);
+  animation: warmPulse 4s ease-in-out forwards;
+}
+.fx-overlay.gold {
+  background: radial-gradient(ellipse at 55% 30%, var(--glow-gold), transparent 65%);
+  animation: goldPulse 3.5s ease-in-out forwards;
+}
+.fx-overlay.amber {
+  background: radial-gradient(ellipse at 45% 50%, var(--glow-amber), transparent 70%);
+  animation: amberPulse 4s ease-in-out forwards;
+}
+.fx-overlay.crimson {
+  background: radial-gradient(ellipse at 50% 50%, var(--glow-crimson), transparent 65%);
+  animation: crimsonPulse 3.5s ease-in-out forwards;
+}
+.fx-overlay.olive {
+  background: radial-gradient(ellipse at 50% 60%, var(--glow-olive), transparent 70%);
+  animation: olivePulse 4s ease-in-out forwards;
+}
+.fx-overlay.desaturate {
+  background: rgba(80, 70, 60, 0.12);
+  animation: desaturateIn 5s ease forwards;
+}
+
+.reader.shake-light {
+  animation: shakeLight 0.8s ease-in-out;
+}
+
+/* ==================== FALLING LEAVES ==================== */
+.leaf {
+  position: fixed;
+  z-index: 40;
+  pointer-events: none;
+  font-size: 16px;
+  opacity: 0;
+  animation: leafFall linear forwards;
+}
+
+/* ==================== OPENING SCREEN ==================== */
+.opening-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 70vh;
+  text-align: center;
+  padding: 40px 20px;
+}
+.opening-title {
+  font-family: var(--brush);
+  font-size: 56px;
+  color: var(--autumn-gold);
+  letter-spacing: 12px;
+  margin-bottom: 16px;
+  text-shadow: 0 2px 12px rgba(200, 148, 58, 0.25);
+  animation: titleFadeIn 1.2s ease;
+}
+.opening-subtitle {
+  font-family: var(--xiaowei);
+  font-size: 14px;
+  color: var(--autumn-brown);
+  letter-spacing: 5px;
+  margin-bottom: 48px;
+  opacity: 0.6;
+  animation: fadeSlideUp 1s ease 0.3s backwards;
+}
+.opening-btn {
+  background: none;
+  border: 1px solid rgba(200, 148, 58, 0.3);
+  color: var(--autumn-gold);
+  padding: 12px 40px;
+  border-radius: 28px;
+  font-family: var(--xiaowei);
+  font-size: 14px;
+  letter-spacing: 4px;
+  cursor: pointer;
+  transition: all 0.4s;
+  animation: fadeSlideUp 1s ease 0.6s backwards;
+}
+.opening-btn:hover {
+  border-color: rgba(200, 148, 58, 0.65);
+  box-shadow: 0 0 30px rgba(200, 148, 58, 0.15);
+  transform: translateY(-2px);
+}
+
+/* ==================== END SCREEN ==================== */
+.end-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 50px 20px;
+  animation: fadeSlideUp 1s ease;
+}
+.end-mark {
+  font-family: var(--brush);
+  font-size: 28px;
+  color: var(--autumn-gold);
+  letter-spacing: 6px;
+  margin-bottom: 20px;
+  opacity: 0.7;
+}
+.end-text {
+  font-family: var(--hand);
+  font-size: 20px;
+  color: var(--paper-text-light);
+  margin-bottom: 12px;
+  line-height: 2;
+  max-width: 400px;
+}
+.end-sub {
+  font-family: var(--xiaowei);
+  font-size: 12px;
+  color: var(--autumn-brown);
+  letter-spacing: 3px;
+  margin-bottom: 36px;
+  opacity: 0.5;
+}
+.end-btn {
+  background: none;
+  border: 1px solid rgba(200, 148, 58, 0.25);
+  color: var(--autumn-gold);
+  padding: 10px 36px;
+  border-radius: 24px;
+  font-family: var(--xiaowei);
+  font-size: 13px;
+  letter-spacing: 3px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.end-btn:hover {
+  border-color: rgba(200, 148, 58, 0.55);
+  box-shadow: 0 0 24px rgba(200, 148, 58, 0.12);
+}
+
+/* ==================== ANIMATIONS ==================== */
+@keyframes paperSlideIn {
+  0% { opacity: 0; transform: translateY(40px) rotate(-1deg); }
+  100% { opacity: 1; transform: translateY(0) rotate(0); }
+}
+
+@keyframes paperUnfold {
+  0% { opacity: 0; transform: scaleY(0.6) scaleX(0.95); }
+  60% { opacity: 0.9; transform: scaleY(1.01) scaleX(1); }
+  100% { opacity: 1; transform: scaleY(1) scaleX(1); }
+}
+
+@keyframes inkSpread {
+  0% { opacity: 0; transform: translateY(8px); filter: blur(2px); }
+  60% { opacity: 0.7; filter: blur(0.5px); }
+  100% { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+
+@keyframes sealPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+@keyframes hintFade {
+  0%, 100% { opacity: 0.45; }
+  50% { opacity: 0.85; }
+}
+
+@keyframes sealBreak {
+  0% { transform: scale(1); opacity: 1; }
+  40% { transform: scale(1.25) rotate(8deg); opacity: 0.7; }
+  100% { transform: scale(0) rotate(25deg); opacity: 0; }
+}
+
+@keyframes fadeSlideUp {
+  0% { opacity: 0; transform: translateY(16px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes titleFadeIn {
+  0% { opacity: 0; transform: scale(0.9); letter-spacing: 4px; }
+  100% { opacity: 1; transform: scale(1); letter-spacing: 12px; }
+}
+
+@keyframes warmPulse {
+  0% { opacity: 0; } 15% { opacity: 1; } 70% { opacity: 0.7; } 100% { opacity: 0; }
+}
+@keyframes goldPulse {
+  0% { opacity: 0; } 10% { opacity: 1; } 60% { opacity: 0.6; } 100% { opacity: 0; }
+}
+@keyframes amberPulse {
+  0% { opacity: 0; } 20% { opacity: 1; } 75% { opacity: 0.5; } 100% { opacity: 0; }
+}
+@keyframes crimsonPulse {
+  0% { opacity: 0; } 15% { opacity: 1; } 65% { opacity: 0.45; } 100% { opacity: 0; }
+}
+@keyframes olivePulse {
+  0% { opacity: 0; } 20% { opacity: 1; } 80% { opacity: 0.4; } 100% { opacity: 0; }
+}
+@keyframes desaturateIn {
+  0% { opacity: 0; } 30% { opacity: 1; } 80% { opacity: 0.5; } 100% { opacity: 0; }
+}
+
+@keyframes shakeLight {
+  0%, 100% { transform: translateX(0); }
+  15% { transform: translateX(-4px) rotate(-0.5deg); }
+  30% { transform: translateX(3px) rotate(0.3deg); }
+  45% { transform: translateX(-2px); }
+  60% { transform: translateX(2px); }
+  75% { transform: translateX(-1px); }
+}
+
+@keyframes leafFall {
+  0% { transform: translateY(-20px) translateX(0) rotate(0deg); opacity: 0; }
+  10% { opacity: 0.6; }
+  90% { opacity: 0.3; }
+  100% { transform: translateY(105vh) translateX(100px) rotate(400deg); opacity: 0; }
+}
+
+/* ==================== REDUCED MOTION ==================== */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ==================== MOBILE ==================== */
+@media (max-width: 430px) {
+  .reader { padding: 16px 12px 50px; }
+  .reader-header { margin: -16px -12px 16px; padding: 10px 16px; }
+  .header-title { font-size: 18px; letter-spacing: 3px; }
+  .folded-paper, .open-paper { padding: 24px 20px; }
+  .prose-paragraph { font-size: 14px; line-height: 1.9; }
+  .prose-inner { font-size: 13px; }
+  .opening-title { font-size: 40px; letter-spacing: 8px; }
+}
+</style>
+</head>
+<body>
+
+<div class="desk-bg"></div>
+<canvas class="dust-canvas" id="dustCanvas"></canvas>
+
+<div class="reader" id="reader">
+  <div class="reader-header">
+    <div class="header-title">地缚灵</div>
+    <div class="header-meta">
+      <div class="header-progress" id="headerProgress"></div>
+      <span id="headerCounter"></span>
+    </div>
+  </div>
+
+  <div class="reader-body" id="readerBody">
+    <div class="opening-screen" id="openingScreen">
+      <div class="opening-title">地缚灵</div>
+      <div class="opening-subtitle">有 些 事 死 了 ， 也 一 了 百 了 不 了</div>
+      <button class="opening-btn" onclick="startReading()">展开信纸</button>
+    </div>
+  </div>
+
+  <div class="fx-overlay" id="fxOverlay"></div>
+</div>
+
+<script>
+// ==================== NOVEL DATA ====================
+const novelData = [
+  {
+    era: 'dawn', time: '某个周五 · 清晨', effect: 'warm', effectDetail: 'leaves',
+    paragraphs: [
+      '曹操被闹钟吵醒的时候，陈宫正飘在他的天花板上，倒挂着看他。',
+      '"......"',
+      '"......"',
+      '曹操把被子拉过头顶。幻觉。肯定是幻觉。连续三周每天只睡四小时，出现幻觉很正常。',
+      '三秒后，他掀开被子坐起来，指着那个半透明的身影："你谁？"',
+      '陈宫从天花板上降下来，像一片落叶似的坐在了曹操的床尾。这人穿着一身看不出年代的灰色衬衫，头发有点长，脸色苍白，眼神茫然。',
+      '过了半响，对面说话了。',
+      '"不知道。"',
+      '"那你在我家干嘛？"',
+      '"不知道。"',
+      '"你什么时候来的？"',
+      '"......不知道。"'
+    ]
+  },
+  {
+    era: 'dawn', time: '周五 · 上午', effect: 'amber',
+    paragraphs: [
+      '曹操了然地点点头，吸了一口气，拿起手机准备报警。不过，手指悬在屏幕上方时，他突然才想到，报警要说什么？',
+      {type:'inner-voice', text:'我家有个鬼？超自然现象？'},
+      '他抬起眼睛，再确认了一遍，确实不是 cosplay。陈宫从身体后半截往下都是透明的。',
+      '行吧。',
+      '他把手机放下。果然自己在工作压力下的接受程度又达到了新境界。',
+      '这个时候，陈宫看着他，忽然说，"但是我知道，你昨晚加班加到 12 点，在便利店买了五块钱的关东煮，两块钱的萝卜和魔芋丝。"',
+      '曹操："......"',
+      '"我还知道，"陈宫飘近了一点，"你冰箱里有三罐过期啤酒，洗衣机里塞着上周的衣服。哦，以及。"他低头看了看曹操的被子，"你睡觉不穿裤子。"',
+      '曹操一把拽紧被子："够了！"',
+      '他花了十分钟洗脸刷牙，期间陈宫一直跟在他身后，距离不多不少维持在一米五左右，从洗手间跟到了厨房，再从厨房跟到客厅。曹操往左，陈宫往左；曹操转身，陈宫转身。这间公寓统共就五十平米，也难得陈宫能一直围绕他做周转运动。',
+      '"你能不能别跟着我？"曹操终于有些忍无可忍。',
+      '"我试过了。"陈宫说，"离开你超过两米，就会被拽回来。"'
+    ]
+  },
+  {
+    era: 'dawn', time: '周五 · 冲向玄关', effect: 'gold',
+    paragraphs: [
+      '他不信邪，拔腿冲向玄关。',
+      '陈宫像被一根无形的绳子扯着，嗖地跟了上来，因为速度太快，整个人，啊不是，整个魂穿过了客厅的吊灯。',
+      '"...疼。"陈宫面无表情地吐出一个字。',
+      {type:'inner-voice', text:'人都死了还会疼。'},
+      '但他还是下意识上前把这半截人给扶正，也就是这个时候，他突然发现陈宫的上半截竟然是以实体存在的。他再次用复杂的目光上下打量了一下，最终绝望地接受了现实。'
+    ]
+  },
+  {
+    era: 'dawn', time: '周五 · 早高峰地铁', effect: 'gold',
+    paragraphs: [
+      '地铁上，曹操盯着手机屏幕，余光里全是陈宫。这也不是他能选择的，关键闹出事了怎么办？...虽然经他验证，目前貌似只有他自己能看到这吉利玩意儿。',
+      '陈宫现在坐在他旁边的空位上——当然，在别人眼里那个位置是空的。',
+      '叮咚，地铁门开了，一个穿JK制服的女生走过来，径直坐进了陈宫的身体里。',
+      '陈宫："......"',
+      '曹操差点笑出声。',
+      '陈宫面无表情地从女生身体里飘出来，飘到了曹操的扶手边。他居高临下地看着曹操，眼神里写满了"你再笑一下试试"。',
+      '曹操点点头表示OK，然后低头，肩膀可疑地抖动。',
+      '早高峰的地铁挤得像沙丁鱼罐头。不消一会儿，空隙里就站满了人。外边列车员用吃奶的劲把一个人踹上来后，地铁又可喜可贺地挤了两分。由于身高限制，曹操自然是被人推搡着，差点就要两脚离地了。这时，忽然他感觉后颈一凉。——陈宫的手穿过了他的肩膀，虚虚拢在他身侧，替他隔开了一点拥挤的人潮。',
+      '"......谢谢。"曹操小声说。',
+      '"不客气。"陈宫的声音从头顶传来，"你身上味道太杂了，我不想闻。"',
+      '曹操："？"'
+    ]
+  },
+  {
+    era: 'dawn', time: '周五 · 公司会议', effect: 'olive',
+    paragraphs: [
+      '回到公司的第一件事是开会。曹操刚开始那会还提心吊胆，害怕别的人看出什么端倪来，但从穿过大马路，走过红绿灯，到爬上那栋老写字楼的十二层，前台小妹冲他笑，一路上没有任何一个人看到他身后那个灰色的东西。大抵也是察觉到了曹操的担心，陈宫始终没有跟得太近，维持在离他可以的最远的距离，安静地跟着。远到直到曹操走进了公司，都几乎差点忘了后面还跟着个人的程度。',
+      '他到会议桌前坐下，老板还没到，其他同事三三两两地进来。',
+      '没有人注意到曹操的异常——或者说，没有人注意到曹操身后的异常。',
+      '因为在他们眼中，那里什么都没有。',
+      '整个会议持续了两个小时，曹操却没办法集中注意力，尽管他表现得仍然很正常，发言、记录、提出修改意见...但时不时地，他还是比平常更频繁地看向玻璃门后的陈宫。',
+      '偶然的一瞥间，他突然看见不远处的陈宫正对着一面镜子发呆。那面镜子上空空如也，照不出他的身影来。',
+      {type:'inner-voice', text:'......这个人，在变成现在这种状态之前，经历过什么？'},
+      {type:'inner-voice', text:'他怎么死的？'},
+      {type:'inner-voice', text:'...为什么偏偏是跟着他？'},
+      '无数问题在曹操脑子里盘旋，但他一个答案都没有。对于一个月薪只有六千的牛马来说，处理工作的琐事之余还要考虑这个，实在是有点奢侈了。'
+    ]
+  },
+  {
+    era: 'dusk', time: '周五 · 傍晚到家', effect: 'amber',
+    paragraphs: [
+      '曹操到家的时候，天已经黑透了。',
+      '他换了鞋，把公文包扔在沙发上，然后瘫进椅子里。陈宫飘在玄关等了两秒才跟进来，这次学乖了，绕过了中间的吊灯。',
+      '一个人一个魂，就这么在大眼瞪小眼的对峙中耗了十来分钟。',
+      '曹操先开口了。',
+      '"你不说话的时候，还挺像正常人的。"',
+      '陈宫没接茬，飘到窗边，往外看了一眼。那一带没什么高楼，能看到远处几栋写字楼的灯还亮着。他看了一会儿，忽然问："今天周五。"',
+      '"嗯。"',
+      '"你不加班？"',
+      '曹操看了他一眼。"请假了，头疼。"',
+      '陈宫没再说话，继续看窗外。',
+      '曹操盯着他的侧脸，不知道为什么突然觉得有点别扭。这人从早上到现在，没有主动说过一句话多余的话，也没有做过任何出格的事。他就是飘着，跟着，偶尔用面无表情的语气蹦出一句让人接不上来的东西。明明死了的身世不明的人是他，到现在只知道自己的名字的人也是他，但看起来却倒是若无其事，反而是他曹操比他本人上心。',
+      {type:'inner-voice', text:'...倒也不是烦。是另一种更微妙的感觉。'},
+      '曹操没来得及细想，手机响了。',
+      '他看了一眼来电显示，是房东。',
+      '"喂？"',
+      '"小曹啊，这个月房租..."',
+      '"我知道，周末转。"',
+      '"不是不是，我是说，你那个房子，有人想买，房东打算卖。不如下个月你另找地方吧。"',
+      '曹操握着手机的手顿了一下。"什么？"',
+      '"具体的合同已经签了，下个月初交房。提前跟你说一声，你抓紧找。"'
+    ]
+  },
+  {
+    era: 'dusk', time: '周五 · 深夜 · 房租', effect: 'crimson', effectDetail: 'shake',
+    paragraphs: [
+      '电话挂了。',
+      '曹操把手机扣在桌上，盯着天花板看了很久。',
+      '陈宫从窗边飘回来，低头看了他一眼。"怎么了？"',
+      '"没地方住了。"',
+      '陈宫沉默了两秒。"哦。"',
+      '曹操烦躁地抓了抓头发。东五环外一居室月租两千，这已经是他能找到的最便宜的选择了。提前一个月搬家意味着要押一付三，加上中介费，起码要准备一万块。',
+      {type:'inner-voice', text:'他的银行卡余额是四千三。'},
+      '"......操。"',
+      '陈宫安静地站在旁边，没有出声。',
+      '过了好一会儿，曹操深吸一口气，翻出手机开始刷租房软件。想了一想，又把预算调到一千五，地点扩大到东六环以外，筛选条件里去掉了"独立卫浴"和"厨房"。',
+      '陈宫飘到他肩膀后面，跟着他的视线一起看手机屏幕。',
+      '"这个，通州，一千二，合租。"',
+      '"不行。"',
+      '"为什么？"',
+      '"离公司一个半小时。"',
+      '"这个呢？一千四，主卧独卫。"',
+      '曹操划走了。"押一付三要五千六。"',
+      '屏幕上刷来刷去，合适的要么太远要么太贵。曹操盯着那些数字，眼眶有点发酸，但他没让自己多想，只是机械地往下滑。',
+      '"不能再跟房东协商一遍吗？"',
+      '"要搬走就是要搬走，没得商量。"曹操回答。',
+      '陈宫没再说话。'
+    ]
+  },
+  {
+    era: 'dusk', time: '周五 · 深夜 · 拖鞋', effect: 'warm',
+    paragraphs: [
+      '曹操起身去厨房倒水，路过玄关的时候余光瞥见门口鞋架上那双拖鞋。那是一双灰色的棉拖鞋，左脚鞋底磨得很薄了，但他穿了两年多一直没换。好在这个家里面，除了他没有别的人在住，因此他也有了旁的理由，过得随意一点没关系。如今这房子里除了一个人以外还多出来一只鬼，他一时之间也有点忘了该怎么跟人好好说话。',
+      '他端着水杯回到客厅，坐下来。',
+      '陈宫还站在窗边。',
+      '夜风从窗缝里灌进来，吹得窗帘轻轻鼓了一下。陈宫的头发被风带起来了一点，然后又落回去。他好像感觉不到温度。',
+      '曹操突然开口："...你饿吗？"',
+      '问完他就后悔了。鬼吃什么。',
+      '陈宫转过身来看着他，表情有一瞬间的变化。太快了，快到曹操以为自己看花了眼。然后他恢复了一贯的面无表情。',
+      '"不饿。"',
+      '"哦。"',
+      '曹操把水喝完，去厨房煮了一碗泡面。他坐在一张塑料折叠桌前吃面的时候，陈宫飘到他对面，就那么看着他。',
+      '"你能不能别看我吃？"',
+      '"你吃得太急了。"',
+      '"关你什么事。"',
+      '"...我以前应该认识你。"',
+      '陈宫想了想，终于说。',
+      '曹操抬头。',
+      '但陈宫已经闭嘴了，又恢复成那副好像什么都不记得的样子。',
+      '曹操放下筷子，看着他。陈宫的衣服还是那件有些年代感的花灰衬衫，领口松垮垮的。他的脸色苍白得近乎透明，像一张曝光过度的照片。他不知道自己的名字，不知道自己怎么死的，也不知道为什么被绑在曹操身边。说到底，他或许也就是什么孤魂野鬼罢了，其实他曹操本可以完全不理会。',
+      {type:'inner-voice', text:'但他说，我应该认识你。'},
+      '行吧，看在认识他的份上。',
+      '"你刚才说的以前，"曹操试探着问，"你还记得什么？"',
+      '陈宫皱了下眉，像是在很用力地想。过了好一会儿，他摇头。',
+      '"不记得了。就是嘴比脑子快。"',
+      '曹操没追问。',
+      {type:'inner-voice', text:'他知道有些事情不能急。就像你不能拽着一棵枯树的根，指望它一夜之间长出新芽。'},
+      '他把剩下的面汤喝完，把碗扔进水槽。',
+      '"明天周六，"曹操宣布，"我要出去看房。你跟着就是了。"',
+      '"我有的选吗？"',
+      '"没有。"',
+      '陈宫点了点头，好像一贯都对这种问答方式习以为常。',
+      '曹操关了厨房的灯，走回卧室。他脱了外套搭在椅背上，然后躺下来。',
+      '陈宫飘在卧室门口，没有进来。',
+      '"你不睡觉？"曹操问。',
+      '"我不需要睡。"',
+      '"那你在外面待着也行，别进来吓我。"',
+      '陈宫没动。',
+      '过了大概五分钟，曹操在黑暗里听到一个很轻的声音。',
+      '"今天开会的时候，你在想什么？"',
+      '曹操愣了一下。',
+      '"干嘛问这个？"',
+      '"没什么。"',
+      '四下没有声音了。',
+      '曹操闭上眼睛。这天晚上，出租屋里里多了一个不存在的人，安静地待在门外的黑暗里。'
+    ]
+  },
+  {
+    era: 'past-morning', time: '周六 · 清晨', effect: 'amber',
+    paragraphs: [
+      '周六早上七点半，曹操被尿憋醒了。',
+      '他迷迷糊糊睁开眼，视线里先出现的是天花板。然后再往上，就是天花板上陈宫那张脸。',
+      '"......你又倒挂着。"',
+      '"习惯了。"陈宫说。',
+      '曹操没力气跟他争论一只鬼到底需不需要习惯这种东西，翻身下床直奔洗手间。陈宫跟在他屁股后面飘了半米，在洗手间门口停住了。',
+      '"你在外面等着。"',
+      '"我不介意。"陈宫耸肩。',
+      '"我介意。"门关上了。',
+      '曹操刷完牙出来的时候，陈宫靠在走廊墙上，姿态很随意。如果不是半透明的下半身，倒像是个路边等孩子放学的普通家长。话说，到了他这个年纪的人，倒像是有妻儿子女的人。一般这个年纪，也应该有个儿子或者女儿的。',
+      {type:'inner-voice', text:'话说，他有孩子吗？'},
+      '"你今天穿什么？"曹操问。',
+      '陈宫低头看了看自己。"就这件。"',
+      '"......你一直就穿这一件？"',
+      '"我只有这一件。"',
+      '曹操走进卧室翻衣柜，想找一件今天看房穿的体面外套。翻着翻着，他手停了。',
+      '衣柜最底下压着一件深蓝色的薄款外套，款式很旧，是他在某个旧货市场随手淘来的。买的时候觉得颜色不错，拿回来就塞进了衣柜，一次都没穿过。',
+      '他把那件外套拎出来。色号、上面的褶皱，莫名其妙地有种熟悉感。',
+      {type:'inner-voice', text:'熟悉到甚至连曹操自己都在怀疑，之前难道真的没有穿过这件衣服吗。'},
+      '就在这个时候，他意识到了旁边陈宫的目光。',
+      '"......"',
+      '曹操回头看了一眼陈宫。',
+      '陈宫飘过来，盯着那件外套。他的表情第一次出现了某种明显的动摇。',
+      '"你认识？"',
+      '"......不认识。"陈宫说。但他没有否认方才的犹豫。',
+      '曹操把外套塞回了衣柜最底层。他没有追问。不过他记住了。'
+    ]
+  },
+  {
+    era: 'past-morning', time: '周六 · 出门看房', effect: 'crimson',
+    paragraphs: [
+      '九点钟，曹操出门看房。',
+      '第一站是通州一个老小区，六楼，没电梯。中介小哥在电话里说"交通便利"，到了才发现所谓交通指的是门口有一趟公交车，四十分钟一趟。',
+      '房子不大，大概二十来平，墙皮发黄，窗户朝北。厨房是公用的，卫生间也是公用的，隔壁住着一家三口，小孩的哭声隔着墙都能听见。',
+      '"怎么样？"中介小哥满脸堆笑。',
+      '曹操看了一眼飘在墙角的陈宫。陈宫面无表情地摇了摇头。',
+      '"不太行。"曹操说。',
+      '第二站在朝阳，比第一站好一些，但价格商量了好几回，死活没有谈下来。曹操看了一眼给的价格，又看了看中介那张期待的脸，找个借口说了句我再考虑考虑，随后一人一魂溜之大吉。',
+      '第三站在东六环，房间倒是够大，但周边环境一言难尽。楼下是个烧烤摊，晚上车水马龙，人来人往，能吵到凌晨两点。曹操还没开口，陈宫先飘到窗边往外看了看，回头对他说：',
+      '"这里烟味会很重。"',
+      '曹操愣了一下。"你能闻到？"',
+      '"不能。但下面人多，人多的地方，就会烟气重。"',
+      '曹操站在空荡荡的房间里。阳光从没拉窗帘的窗户照进来，灰尘在光柱里打着旋。陈宫站在光里，半透明的身体被光线穿透，像是镀了一层薄薄的金边。',
+      {type:'inner-voice', text:'不知道是不是曹操的错觉，他觉得阳光下陈宫透明的部分变多了。'},
+      '他垂着眼，也不知道在想什么。',
+      '"走吧。"曹操说。'
+    ]
+  },
+  {
+    era: 'past-morning', time: '周六 · 午后凉皮', effect: 'warm',
+    paragraphs: [
+      '回到出租屋楼下的时候已经是下午两点。曹操买了一碗凉皮在路上吃，午市人多，四处都是人，曹操就找了一个挨垃圾桶旁边的凳子开始吃起来。陈宫飘在旁边，看他吃得稀里哗啦。',
+      '"你为什么总是吃这么快？"',
+      '"饿。"',
+      '"早上没见着你吃。"',
+      '"没来得及。"',
+      '陈宫沉默了一会儿。"你经常这样？"',
+      '"什么这样？"',
+      '"不按时吃饭。加班。住不好的房子。"',
+      '曹操停下筷子，看了他一眼。"你管得倒挺宽。"',
+      '"我管不了别的。"陈宫说，"只能管你这个。"',
+      '曹操张了张嘴，没说出个好歹来。他把最后一口凉皮塞进嘴里，把塑料碗扔进了路边垃圾桶。'
+    ]
+  },
+  {
+    era: 'notes', time: '周六 · 夜 · 搜索', effect: 'gold',
+    paragraphs: [
+      '回到家，他在沙发上瘫了一会儿，然后拿起手机。',
+      '在搜索引擎里输入"陈宫"后，出现的资料很多，零零散散，结果五花八门。有同名的大学教授、有微博网红、有某上市公司的独立董事。直到他翻了几页，突然想到把"陈宫"和"曹操"一起输入，随后一个百科词条弹了出来。',
+      '他看了看不远处的陈宫，随即把手机扣在沙发上。',
+      {type:'inner-voice', text:'那天他看到了什么？'},
+      '晚上他起身去厨房，打开冰箱。里面还剩两个鸡蛋、半包挂面、一棵蔫了的白菜。他煮了一锅面，打了两个荷包蛋，把白菜洗干净切碎丢进去。面煮好了，盛了两碗。',
+      '接着他端着两碗面走到餐桌前，把其中一碗放在对面。',
+      '"我吃不了。"陈宫说。',
+      '曹操看也没看他，把面和筷子摆好。"我乐意放着。"',
+      '陈宫看着那碗面。面条上飘着热气，荷包蛋的蛋黄半熟不熟，白菜叶碧绿碧绿的。一切都透着一种廉价但认真的意思。',
+      '他沉默了一会儿，然后慢慢飘过来，坐在了那碗面的对面。',
+      '吃完面，曹操回到客厅坐下。陈宫还在餐桌旁，像是已经习惯那个位置了。'
+    ]
+  },
+  {
+    era: 'notes', time: '周六 · 深夜 · 提议', effect: 'warm',
+    paragraphs: [
+      '"我有个想法。"曹操说。',
+      '陈宫看过来。',
+      '"你说你不记得自己是谁，对吧？但你说认识我，也记得这个名字。那说明你的记忆不是完全消失了，是被什么东西封住了，或者说被压得很深。"',
+      '"......然后呢？"',
+      '"然后我们来试。"曹操打开手机备忘录，"以后你看到什么有感应的东西就告诉我。画面也行。"',
+      '陈宫表情出现了一瞬的微妙。',
+      '"你为什么要帮我？"',
+      '"你是地缚灵，绑在我身上的。"曹操假装理所当然地说，交叉手臂在胸前，"你不搞清楚自己怎么回事，万一哪天突然想不开把我也跟着超度了怎么办。"',
+      '"......"',
+      '"开玩笑的。"',
+      '临睡的时候，曹操关了手机，把它塞回枕头底下。陈宫像之前一样飘在卧室外，但看上去似乎有些神情复杂。眉头微动，像在思考重要的事情。',
+      '"曹操。"',
+      '"嗯？"',
+      '"你这个人......"陈宫想了很久，似乎在寻找一个合适的词。"很奇怪。"',
+      '"哪里奇怪？"',
+      '"别人如果碰到这种事，应该会很害怕，或者很烦。"',
+      '"我也烦。"',
+      '"但你刚刚煮面多煮了我的。"',
+      '曹操顿了一下。',
+      '"煮多了而已。"他嘴硬道。',
+      '"你那冰箱里就剩两个鸡蛋了。"',
+      '"......你还有透视能力？"',
+      '"你拿菜的时候我看见了。"',
+      '曹操发现跟一个鬼魂讲道理是一件非常没有胜算的事情，因为他会在旁边飘着看你做一切事情。这人说不准闲着没事干，在他睡觉的时候，把他家有多少只蟑螂都数遍了。想到这里，他就觉得阴风阵阵。',
+      '他放弃了反驳。',
+      '"喂，你以前......"曹操犹豫了一下，"你以前跟我认识的时候，也是这样吗？什么都要跟我较真。"',
+      '陈宫看着他，目光微动。过了几秒，他偏过头。',
+      '"不知道。但如果是的话——"',
+      '他顿了一下。',
+      '"大概是你活该吧。"',
+      '曹操差点把枕头扔过去。'
+    ]
+  },
+  {
+    era: 'notes', time: '日子流转', effect: 'olive',
+    paragraphs: [
+      '日子就这么过下来了。曹操上班，陈宫跟着。曹操的备忘录里记的东西越来越多。',
+      {type:'image', text:'"周二，陈宫看到路边有人下棋，站了很久。他不会下棋。"'},
+      {type:'image', text:'"周六，路过一家卖鱼的店铺，陈宫的脸色变了。问他怎么了，说是头疼。"'},
+      {type:'image', text:'"周四，路边有个女人抱着婴儿，他说..."'},
+      '...',
+      '曹操把这些碎片拼在一起，笔头都快写岔了，左右却什么也没拼出来。',
+      '...',
+      '晚上去洗脸时，他抬起头，抹掉脸上的水蒸气，然后透过洗手间半开的门缝看过去。陈宫飘在不远处背对着自己。',
+      {type:'inner-voice', text:'曹操的手心泛起一层冷汗。'},
+      '过了两天，他在网上下单了符咒。'
+    ]
+  },
+  {
+    era: 'truth', time: '某个周三 · 凌晨 · 车祸', effect: 'crimson', effectDetail: 'shake',
+    paragraphs: [
+      '又一个周三，曹操加班到凌晨。',
+      '等到他从写字楼出来的时候，地铁已经停了。他站在路边等网约车，冷风灌进领口，太阳穴跟着突突地跳。陈宫飘在他旁边，忽然说："你不该熬到这么晚。"',
+      '"项目赶。"',
+      '"项目赶，命也赶吗？"',
+      '"哈，你什么时候学会说这种话了？"',
+      '陈宫没理他。曹操低头看手机，等车的空隙刷了一下朋友圈。一辆轿车从路口冲出来的时候，他甚至没听见喇叭声。',
+      '是陈宫把他拽回来的。',
+      '陈宫的手实打实地扣在他手腕上，把他整个人往路牙石上一带。车子几乎是擦着他的衣角过去，司机骂了一句脏话，留下一串尾气。',
+      '曹操摔坐在路牙石上，脑子发懵，心跳得像要从嗓子眼里吐出来。他坐在地上缓了一会，低头看自己的手腕，上面有道发白的指痕，正慢慢泛红。',
+      '陈宫站在他面前。他的下半身几乎全透明了，只剩下半截上半身还留着形，比一团被揉皱的雾还走样点。',
+      '"你......"',
+      '"我没事。"陈宫说。他的声音比平时轻。',
+      '"你刚才变实了。"',
+      '"对。"',
+      '"你以前碰我都是穿过去的。"',
+      '陈宫看了看天空。他飘到曹操身边，准备再试着伸手拉他起来，这次手指却是穿透了曹操的肩膀。他皱眉，试了两次，都穿了过去。第三次，他放弃了，把手收了回去。',
+      {type:'inner-voice', text:'曹操眼看着这一幕，喉咙里像堵了团棉花。'},
+      '"上车吧。"陈宫说，"车到了。"'
+    ]
+  },
+  {
+    era: 'truth', time: '某个周三 · 网约车后座', effect: 'desaturate',
+    paragraphs: [
+      '车里摇摇晃晃。穿过车窗外稀疏的霓虹灯，从大路一路颠簸着，回到小路。曹操头枕在网约车的后排，看着旁边的陈宫，自言自语地开口。',
+      '"你变透明了。"',
+      '"嗯。"',
+      '"比昨天。"',
+      '"嗯。"',
+      '"是不是因为你想起来的东西越多，就越......"曹操没把那个词说出来。',
+      '陈宫沉默了很久。',
+      '"大概是。"',
+      '"那我以后不让你想了。"',
+      '"你也拦不住。"陈宫说，"有些事想起来，不是我选的。"',
+      '曹操咬咬牙，直起身来，盯着他。',
+      {type:'inner-voice', text:'"那我帮你查清楚，查清楚你就......"他的声音卡住了。查清楚，执念了结，你就该走了。这话他自己都说不出口。'},
+      '陈宫看着他。是怜悯吗？',
+      '"曹操。"',
+      '"干什么？"',
+      '"你怕我消失？"',
+      '曹操没回答。他重新躺回去，把头撇向一边。'
+    ]
+  },
+  {
+    era: 'moving', time: '某天 · 搬家', effect: 'amber',
+    paragraphs: [
+      '曹操最终租下了通州一间合租的主卧。一千二一个月，押一付一，不用中介费。',
+      '房间不大，大概二十平，塞下一张床一个衣柜就满了，但好歹有个朝南的窗户。搬家那天曹操请了半天假。他没什么行李，两个编织袋装衣服，一个纸箱装杂物，外加那张塑料折叠桌。',
+      '他把东西从一楼搬上六楼的时候，差点把腰闪了。',
+      '陈宫飘在他旁边，帮不上忙。',
+      '"你就不能现在变实一下帮我搬？"',
+      '"我又不能控制。"陈宫耸肩。',
+      '"那你飘着也挡道。"陈宫往旁边飘了半米。',
+      '曹操把东西搬完的时候，已经是下午三点了。他花了两个小时把房间收拾出来，床单铺好，衣柜擦干净，折叠桌支在窗边当餐桌。陈宫飘在新房间中央，转了一圈。',
+      '"好小。"',
+      '"我也知道小。"',
+      '"比你上次的地方还小。"',
+      '"你上次待的地方还是天花板呢。"曹操白了他一眼，把最后一个编织袋塞进衣柜底下，"你飘上面凉快去，不占地方。"',
+      '陈宫没接茬，飘到窗边往外看。新小区比旧的高，能看到远处一排居民楼的屋顶，还有更远处灰蒙蒙的天际线。',
+      '"不过比上一个地方亮。"他说。',
+      '曹操顺着他的目光看出去。窗户朝南，下午的阳光正好照进来，在地板上画了一个长方形的光斑。陈宫站在光斑里，由着透明的身体被光线穿透。',
+      {type:'inner-voice', text:'他突然发现陈宫身体透明的地方比上次多了，这次来到了腹部的地方。'},
+      '曹操把那件深蓝色外套从编织袋里翻出来，犹豫了一下，挂在了衣柜门上。'
+    ]
+  },
+  {
+    era: 'moving', time: '新家 · 第一夜', effect: 'warm',
+    paragraphs: [
+      '新家的第一晚，曹操躺在床上，听着隔壁合租室友的电视声。陈宫飘在卧室门口，这回连门都没有，只剩一个布帘子。',
+      '"别在外面飘了，"曹操翻了个身，"进来吧。反正也没地方躲。"',
+      '过了一会儿，陈宫就飘进来了，在床尾的角落停下。二十平的房间，床就占了一半，陈宫直愣愣站在那里，比之前更显眼。',
+      '"你别看我睡觉。"',
+      '"我没有。我在看窗户。"',
+      '"一扇窗户而已，有什么好看的。"',
+      '曹操闭了眼。房间很小，隔壁的电视声、楼下小孩的喊叫声、窗户缝里灌进来的风声，都听得清清楚楚。',
+      '"...对了，你有孩子吗？"',
+      '"为什么问这个？"',
+      '"如果你有的话，我会帮你找，"曹操顿了顿，把手机收起来，"你之前说过的...有印象。如果是你的小孩，那说不定有记录。"',
+      '陈宫看着他。',
+      '"你到底图什么？"他问。',
+      '"图你搞清楚自己怎么回事，别赖在我家飘一辈子。"',
+      '"只是因为这个？"',
+      '"不然呢。"',
+      '陈宫没追问。他转回去继续看窗外。过了一会儿，他开口说：',
+      '"你帮了我，我也帮不了你什么。"',
+      '"你又来了。"',
+      '"我是认真的。"',
+      '曹操看了他一眼。窗外的路灯光打在陈宫的脸上，照不出五官的轮廓，只留下一个模糊的灰色的轮廓。说起来也很超现实，一个已经死了的人，在替活着的人操心回报的问题。',
+      '"你先操心你自己吧。"曹操说。'
+    ]
+  },
+  {
+    era: 'truth', time: '某晚 · 黄昏 · 对峙', effect: 'crimson', effectDetail: 'shake',
+    paragraphs: [
+      '一个平常的晚上，陈宫照例飘在对面，看曹操吃饭。',
+      '"曹操。"',
+      '"嗯？"',
+      '"你查过我的名字。"',
+      '曹操手里的筷子顿了一下。',
+      '"那天你看完手机，把屏幕扣下去了。"陈宫的声音继续说，"你以为我没看见吧。"',
+      '曹操没说话。',
+      '"你那天查到了什么？"',
+      '"网上同名的人有很多。"曹操低头把菜夹进嘴里，没抬头，"有个大学教授，还有个上市公司董事。还有一些旁的别的人，我们只要把每个结果慢慢排除，就能..."',
+      '"你查的不是他们。"陈宫打断他。',
+      '曹操把筷子放下了。两个人在徐徐黄昏下对视。饭菜的味道在小小的房间里散开。',
+      {type:'inner-voice', text:'曹操知道陈宫说的是什么。他的手指收紧了。'},
+      '"我自己想起来的。"陈宫看着他，"跟你没关系。这几天断断续续的。"',
+      '"你想起了多少？"',
+      '"不多。"陈宫偏过头，把目光放到桌子上。"但是足够了。"',
+      '"...是谁？"',
+      '他飘到衣柜前，看了一眼那件上衣。',
+      '"你这个人..."他终于张嘴说，语气变了，带着一种曹操听不懂的疲惫。"从来都是这样。"',
+      '"自以为是。信不得人。嘴上说一套做一套。"',
+      '沉默半响。',
+      {type:'inner-voice', text:'对，确实是他。他嘲讽地在心里笑了。'},
+      '"所以呢？"曹操猛地转过身，盯着他看，"你一路跟着我，从地铁到这破出租屋，是不是就等着看我现在这副窝囊样。"',
+      {type:'inner-voice', text:'他想问，是不是因为这个。因为我才是那个害死你的人？结果他一个字都没问出来。'},
+      '陈宫看着他，脸上没有愤怒，也没有怨恨。他只是慢慢飘近了一点，低头俯视着眼前这个双眼泛出通红的男人。'
+    ]
+  },
+  {
+    era: 'truth', time: '某晚 · 夜 · 执念', effect: 'warm', effectDetail: 'leaves',
+    paragraphs: [
+      '"所以，你会消失吗？"曹操最后挤出一句话，声音带上了一丝不可觉察的颤抖。',
+      '"什么意思？"',
+      '"执念了结了，"曹操看着地板，仿佛那里有个洞，"地缚灵不就该消失了吗。"',
+      '陈宫飘回来。他低头看着曹操，那种表情和第一天倒挂在天花板上的时候没什么两样。',
+      '"那你觉得，我的执念是什么？"',
+      '"你不知道自己怎么死的。"',
+      '"我现在知道了。"',
+      '"那就是想复仇了。"',
+      '"我也不想。"',
+      '"那你到底想干什么？"',
+      '"有这么一个人，我那时候不想跟着他。"陈宫说，声音很轻，"但大概上天不喜欢我。死了以后，还是被绑过来了。"',
+      '曹操转身。',
+      {type:'inner-voice', text:'"...你的执念不是这个？"'},
+      '陈宫没再说话。过了许久。',
+      '"我本以为，有些事死了，也就一了百了了。"',
+      '他接着说，"可我发现，我还是要看着他。"',
+      '房间里很安静。隔壁的电视声不知道什么时候停了。',
+      '"我说过了。我管不了别的。"陈宫说。',
+      '"...你以前是不是也这么说过？"',
+      '"不知道。"陈宫停了一下，"大概吧。"'
+    ]
+  },
+  {
+    era: 'walk', time: '某天 · 黄昏散步', effect: 'warm', effectDetail: 'leaves',
+    paragraphs: [
+      '某天下午，曹操突然说要出去走走。他没有说走是去哪里。陈宫也没有问。他只是跟在曹操身后，出了那间小平房的铁皮门。',
+      '这个街区的黄昏真的很安静。巷子里没有路灯，只有各家窗户里透出来的光。影子被身后窗户的光拉得很长。',
+      '走了几步，陈宫忽然飘到曹操身边。',
+      '"曹操。"',
+      '"嗯？"',
+      '"你记得你以前的事吗？"',
+      '"什么事？"',
+      '"三岁以前的事。"',
+      '"这么早？"曹操想了想。"不记得了。"',
+      '"四岁呢？"',
+      '"也不记得。人记不住那么早的事。"',
+      '"嗯。"陈宫说，"我也是。我那天最早能想起来的画面，是你。"',
+      {type:'inner-voice', text:'曹操停下脚步。'},
+      '陈宫飘在他身前，逆着巷子尽头的余光。他的脸在昏暗里几乎是看不出来的，但曹操知道他在看着自己。',
+      '"我不知道那算什么。"陈宫说，"也许我们以前确实如此。但如果是真的——"',
+      '他停了一下。',
+      '"那我不怪你了。"',
+      {type:'inner-voice', text:'曹操的眼眶发酸了。'},
+      '他不知道该说什么好，只是在原地挪了挪步子。于是他没有说话，只是继续往前走。',
+      '走到巷口的时候，他终于说。',
+      '"原谅归原谅，但有件事你最好搞清楚。"',
+      '曹操回头。陈宫还飘在原地。',
+      '"我不喜欢欠别人的东西。"他说，"尤其是人命。"',
+      '陈宫看着他，忽然觉得有点哭笑不得。',
+      '"行。"他说。',
+      '曹操转回身，继续走。',
+      '远处有放学的小学生成群结队地走过来，书包在背上一颠一颠的。夕阳把整个街道都染成了暖橘色。',
+      '陈宫跟在他身后，不远不近，一米五的距离。'
+    ]
+  }
+];
+
+const eras = {
+  'dawn':         { label: '初遇' },
+  'dusk':         { label: '渐深' },
+  'past-morning': { label: '寻觅' },
+  'notes':        { label: '碎片' },
+  'truth':        { label: '真相' },
+  'moving':       { label: '新居' },
+  'walk':         { label: '黄昏' }
+};
+
+// ==================== STATE ====================
+let currentSegment = 0;
+let isReading = false;
+let currentEra = null;
+
+const reader = document.getElementById('reader');
+const readerBody = document.getElementById('readerBody');
+const fxOverlay = document.getElementById('fxOverlay');
+const headerCounter = document.getElementById('headerCounter');
+const headerProgress = document.getElementById('headerProgress');
+const openingScreen = document.getElementById('openingScreen');
+
+// ==================== DUST PARTICLES ====================
+const dustCanvas = document.getElementById('dustCanvas');
+const ctx = dustCanvas.getContext('2d');
+let dustParticles = [];
+
+function initDust() {
+  dustCanvas.width = window.innerWidth;
+  dustCanvas.height = window.innerHeight;
+  dustParticles = [];
+  for (let i = 0; i < 35; i++) {
+    dustParticles.push({
+      x: Math.random() * dustCanvas.width,
+      y: Math.random() * dustCanvas.height,
+      size: Math.random() * 1.5 + 0.5,
+      speedX: (Math.random() - 0.5) * 0.25,
+      speedY: (Math.random() - 0.5) * 0.15 - 0.08,
+      opacity: Math.random() * 0.25 + 0.08,
+      phase: Math.random() * Math.PI * 2
+    });
+  }
+}
+
+function animateDust() {
+  ctx.clearRect(0, 0, dustCanvas.width, dustCanvas.height);
+  const time = Date.now() * 0.001;
+  dustParticles.forEach(p => {
+    p.x += p.speedX + Math.sin(time + p.phase) * 0.08;
+    p.y += p.speedY + Math.cos(time * 0.7 + p.phase) * 0.04;
+    if (p.x < 0) p.x = dustCanvas.width;
+    if (p.x > dustCanvas.width) p.x = 0;
+    if (p.y < 0) p.y = dustCanvas.height;
+    if (p.y > dustCanvas.height) p.y = 0;
+    const flicker = 0.5 + 0.5 * Math.sin(time * 1.5 + p.phase);
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(200, 168, 120, ${p.opacity * flicker})`;
+    ctx.fill();
+  });
+  requestAnimationFrame(animateDust);
+}
+
+window.addEventListener('resize', () => {
+  dustCanvas.width = window.innerWidth;
+  dustCanvas.height = window.innerHeight;
+});
+
+initDust();
+animateDust();
+
+// ==================== PROGRESS DOTS ====================
+function initProgressDots() {
+  headerProgress.innerHTML = '';
+  for (let i = 0; i < novelData.length; i++) {
+    const dot = document.createElement('span');
+    dot.className = 'progress-dot';
+    headerProgress.appendChild(dot);
+  }
+}
+
+function updateProgress() {
+  const dots = headerProgress.querySelectorAll('.progress-dot');
+  dots.forEach((dot, i) => {
+    dot.classList.remove('active', 'read');
+    if (i < currentSegment) dot.classList.add('read');
+    else if (i === currentSegment) dot.classList.add('active');
+  });
+  headerCounter.textContent = `${currentSegment + 1} / ${novelData.length}`;
+}
+
+// ==================== FALLING LEAVES ====================
+function createLeaves(count) {
+  const leafChars = ['🍂', '🍁', '🍃'];
+  for (let i = 0; i < count; i++) {
+    setTimeout(() => {
+      const leaf = document.createElement('div');
+      leaf.className = 'leaf';
+      leaf.textContent = leafChars[Math.floor(Math.random() * leafChars.length)];
+      leaf.style.left = Math.random() * 100 + 'vw';
+      leaf.style.top = '-20px';
+      leaf.style.fontSize = (14 + Math.random() * 16) + 'px';
+      const duration = 5 + Math.random() * 7;
+      leaf.style.animationDuration = duration + 's';
+      leaf.style.animationDelay = Math.random() * 0.8 + 's';
+      document.body.appendChild(leaf);
+      setTimeout(() => leaf.remove(), (duration + 1.5) * 1000);
+    }, i * 500);
+  }
+}
+
+// ==================== EFFECTS ====================
+function triggerStoryEffect(type, detail) {
+  fxOverlay.className = 'fx-overlay';
+  reader.classList.remove('shake-light');
+
+  requestAnimationFrame(() => {
+    if (['warm','gold','amber','crimson','olive'].includes(type)) {
+      fxOverlay.classList.add(type, 'active');
+      setTimeout(() => fxOverlay.classList.remove('active'), 4500);
+    }
+    if (type === 'desaturate') {
+      fxOverlay.classList.add('desaturate', 'active');
+      setTimeout(() => fxOverlay.classList.remove('active'), 5500);
+    }
+    if (detail === 'shake') {
+      setTimeout(() => {
+        reader.classList.add('shake-light');
+        setTimeout(() => reader.classList.remove('shake-light'), 800);
+      }, 600);
+    }
+    if (detail === 'leaves') {
+      createLeaves(5);
+    }
+  });
+}
+
+// ==================== START ====================
+function startReading() {
+  openingScreen.style.transition = 'opacity 0.5s ease';
+  openingScreen.style.opacity = '0';
+  setTimeout(() => {
+    openingScreen.style.display = 'none';
+    renderSegment();
+  }, 500);
+}
+
+// ==================== RENDER SEGMENT ====================
+function renderSegment() {
+  if (currentSegment >= novelData.length) {
+    showEndScreen();
+    return;
+  }
+
+  const data = novelData[currentSegment];
+  const era = eras[data.era];
+
+  // Era separator
+  if (data.era !== currentEra) {
+    currentEra = data.era;
+    const sep = document.createElement('div');
+    sep.className = 'era-sep';
+    sep.innerHTML = `<span class="era-sep-label">${era.label}</span>`;
+    readerBody.appendChild(sep);
+  }
+
+  // Create folded paper
+  const paper = document.createElement('div');
+  paper.className = 'folded-paper';
+  paper.setAttribute('data-era', data.era);
+
+  const sealChar = ['宫','灵','缚','忆','念','缘','尘','归'][Math.floor(Math.random() * 8)];
+
+  paper.innerHTML = `
+    <div class="paper-folded-body">
+      <div class="folded-time">${data.time}</div>
+      <div class="folded-seal">
+        <div class="seal-icon"><span class="seal-char">${sealChar}</span></div>
+        <div class="seal-hint">—— 点击展开 ——</div>
+      </div>
+    </div>
+  `;
+
+  paper.addEventListener('click', () => {
+    if (isReading) return;
+    openPaper(paper, data);
+  });
+
+  readerBody.appendChild(paper);
+  updateProgress();
+  scrollToView();
+}
+
+// ==================== OPEN PAPER ====================
+function openPaper(paperEl, data) {
+  isReading = true;
+
+  // Break seal
+  const seal = paperEl.querySelector('.seal-icon');
+  const hint = paperEl.querySelector('.seal-hint');
+  if (seal) seal.style.animation = 'sealBreak 0.4s ease forwards';
+  if (hint) hint.style.opacity = '0';
+
+  // Folded paper fades
+  setTimeout(() => {
+    paperEl.style.transition = 'all 0.5s ease';
+    paperEl.style.opacity = '0';
+    paperEl.style.transform = 'scale(0.96) translateY(8px)';
+  }, 400);
+
+  // Replace with open paper
+  setTimeout(() => {
+    paperEl.remove();
+
+    const openPaper = document.createElement('div');
+    openPaper.className = 'open-paper';
+    openPaper.setAttribute('data-era', data.era);
+    openPaper.innerHTML = `<div class="paper-header"><div class="paper-time">${data.time}</div></div>`;
+
+    readerBody.appendChild(openPaper);
+
+    // Trigger effect
+    if (data.effect) {
+      triggerStoryEffect(data.effect, data.effectDetail);
+    }
+
+    // Progressive reveal
+    revealContent(openPaper, data.paragraphs, () => {
+      isReading = false;
+      currentSegment++;
+      updateProgress();
+      if (currentSegment < novelData.length) {
+        showNextPrompt();
+      } else {
+        setTimeout(showEndScreen, 800);
+      }
+    });
+  }, 900);
+}
+
+// ==================== REVEAL CONTENT ====================
+function revealContent(paperEl, paragraphs, onComplete) {
+  let index = 0;
+
+  function showNext() {
+    if (index >= paragraphs.length) {
+      onComplete();
+      return;
+    }
+
+    const p = paragraphs[index];
+    const block = document.createElement('div');
+    block.className = 'prose-block';
+
+    if (typeof p === 'string') {
+      const para = document.createElement('p');
+      para.className = 'prose-paragraph';
+      para.textContent = p;
+      block.appendChild(para);
+    } else if (p.type === 'inner-voice') {
+      const inner = document.createElement('p');
+      inner.className = 'prose-inner';
+      inner.textContent = p.text;
+      block.appendChild(inner);
+    } else if (p.type === 'image') {
+      const img = document.createElement('div');
+      img.className = 'prose-image';
+      img.textContent = p.text;
+      block.appendChild(img);
+    }
+
+    paperEl.appendChild(block);
+    scrollToView();
+
+    index++;
+    const delay = 350 + Math.random() * 450;
+    setTimeout(showNext, delay);
+  }
+
+  showNext();
+}
+
+// ==================== NEXT PROMPT ====================
+function showNextPrompt() {
+  const prompt = document.createElement('div');
+  prompt.className = 'next-prompt';
+  const nextEra = eras[novelData[currentSegment].era];
+  const btn = document.createElement('button');
+  btn.className = 'next-btn';
+  btn.textContent = `展开下一张 · ${nextEra.label}`;
+  btn.addEventListener('click', () => {
+    prompt.remove();
+    renderSegment();
+  });
+  prompt.appendChild(btn);
+  readerBody.appendChild(prompt);
+  scrollToView();
+}
+
+// ==================== END SCREEN ====================
+function showEndScreen() {
+  const endDiv = document.createElement('div');
+  endDiv.className = 'end-screen';
+  endDiv.innerHTML = `
+    <div class="end-mark">终</div>
+    <div class="end-text">陈宫跟在他身后，不远不近，一米五的距离。</div>
+    <div class="end-sub">—— 全文完 ——</div>
+    <button class="end-btn" onclick="resetReading()">重新阅读</button>
+  `;
+  readerBody.appendChild(endDiv);
+  scrollToView();
+  createLeaves(10);
+}
+
+// ==================== RESET ====================
+function resetReading() {
+  currentSegment = 0;
+  currentEra = null;
+  isReading = false;
+  readerBody.innerHTML = `
+    <div class="opening-screen" id="openingScreen">
+      <div class="opening-title">地缚灵</div>
+      <div class="opening-subtitle">有 些 事 死 了 ， 也 一 了 百 了 不 了</div>
+      <button class="opening-btn" onclick="startReading()">展开信纸</button>
+    </div>
+  `;
+  updateProgress();
+}
+
+// ==================== SCROLL ====================
+function scrollToView() {
+  setTimeout(() => {
+    window.scrollTo({
+      top: document.body.scrollHeight,
+      behavior: 'smooth'
+    });
+  }, 80);
+}
+
+// ==================== INIT ====================
+initProgressDots();
+updateProgress();
+</script>
+</body>
+</html>
